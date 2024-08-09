@@ -19,7 +19,7 @@ public class CustomerService {
 
     public String createCustomer(CustomerRequest customerRequest) {
         var customer = customerRepository.save(customerMapper.toCustomer(customerRequest));
-        return null;
+        return customerRepository.save(customer).getId();
     }
 
     public void updateCustomer(CustomerRequest customerRequest) {
@@ -62,7 +62,5 @@ public class CustomerService {
         return customerRepository.findById(customerId)
                 .map(customerMapper::fromCustomer)
                 .orElseThrow(() -> new CustomerNotFoundException(format("Cannot update customer. No customer found with provided ID: %s", customerId)));
-
-
     }
 }
