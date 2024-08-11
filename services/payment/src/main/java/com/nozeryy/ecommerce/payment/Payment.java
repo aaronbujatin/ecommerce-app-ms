@@ -21,7 +21,7 @@ public class Payment {
     @Id
     @GeneratedValue
     private Integer id;
-    private BigDecimal bigDecimal;
+    private BigDecimal amount;
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
     private Integer orderId;

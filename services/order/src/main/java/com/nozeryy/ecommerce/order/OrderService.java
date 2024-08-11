@@ -6,6 +6,8 @@ import com.nozeryy.ecommerce.kafka.OrderConfirmation;
 import com.nozeryy.ecommerce.kafka.OrderProducer;
 import com.nozeryy.ecommerce.orderline.OrderLineRequest;
 import com.nozeryy.ecommerce.orderline.OrderLineService;
+import com.nozeryy.ecommerce.payment.PaymentClient;
+import com.nozeryy.ecommerce.payment.PaymentRequest;
 import com.nozeryy.ecommerce.product.ProductClient;
 import com.nozeryy.ecommerce.product.PurchaseRequest;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ public class OrderService {
     private final OrderMapper orderMapper;
     private final OrderLineService orderLineService;
     private final OrderProducer orderProducer;
+    private final PaymentClient paymentClient;
 
     public Integer createOrder(OrderRequest orderRequest) {
         var customer = customerClient.findCustomerById(orderRequest.customerId())
@@ -40,6 +43,15 @@ public class OrderService {
                     )
             );
        }
+
+       var paymentRequest = new PaymentRequest(
+               orderRequest.amount(),
+               orderRequest.paymentMethod(),
+               order.getId(),
+               order.getReference(),
+               customer
+       );
+       paymentClient.requestOrderPayment(paymentRequest);
 
        orderProducer.sendOrderConfirmation(
                new OrderConfirmation(
